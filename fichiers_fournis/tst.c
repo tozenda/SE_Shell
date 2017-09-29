@@ -51,6 +51,15 @@ int main()
 						dup2(sortie,STDOUT_FILENO);
 						close(sortie);
 				}
+				if (l->in!=NULL){
+						int entree = open(l->in,O_RDWR);
+						if(entree < 0){
+							printf("Fichier invalide\n");
+							break;
+						}
+						dup2(entree,STDIN_FILENO);
+						close(entree);
+				}
 				execvp(cmd[0],cmd);
 				break;
 				default : // le pere attend la terminaison du fils
