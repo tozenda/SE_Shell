@@ -1,9 +1,13 @@
 /*
- * Copyright (C) 2002, Simon Nieuviarts
- */
+* Copyright (C) 2002, Simon Nieuviarts
+*/
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include "readcmd.h"
+#include <sys/types.h>
+#include <sys/wait.h>
 
 
 int main()
@@ -29,15 +33,24 @@ int main()
 
 		if (l->in) printf("in: %s\n", l->in);
 		if (l->out) printf("out: %s\n", l->out);
-
 		/* Display each command of the pipe */
 		for (i=0; l->seq[i]!=0; i++) {
 			char **cmd = l->seq[i];
-			printf("seq[%d]: ", i);
-			for (j=0; cmd[j]!=0; j++) {
-				printf("%s ", cmd[j]);
+			int status,spid;
+			switch(spid = fork()){
+				case -1 : perror(0);
+				exit(-1);
+				case 0 :
+				execvp(cmd[0],cmd);
+				break;
+				default : // le pere attend la terminaison du fils
+				if (waitpid(spid,&status,0)==-1) {
+					perror(0);
+					exit(-1);
+				}
+				break;
+				printf("\n");
 			}
-			printf("\n");
 		}
 	}
 }
