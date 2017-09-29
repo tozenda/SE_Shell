@@ -8,6 +8,7 @@
 #include "readcmd.h"
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <fcntl.h>
 
 
 int main()
@@ -41,6 +42,15 @@ int main()
 				case -1 : perror(0);
 				exit(-1);
 				case 0 :
+				if (l->out!=NULL){
+						int sortie = open(l->out,O_RDWR);
+						if(sortie < 0){
+							printf("Fichier invalide\n");
+							break;
+						}
+						dup2(sortie,STDOUT_FILENO);
+						close(sortie);
+				}
 				execvp(cmd[0],cmd);
 				break;
 				default : // le pere attend la terminaison du fils
