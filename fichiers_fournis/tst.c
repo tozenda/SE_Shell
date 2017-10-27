@@ -42,6 +42,13 @@ int main()
 				case -1 : perror(0);
 				exit(-1);
 				case 0 :
+				//TODO
+				if (l->seq[i+1]=='|'){
+					//Un pipe est présent.
+					int p[2];
+					int res = pipe(p);
+					dup2()
+				}
 				if (l->out!=NULL){
 						int sortie = open(l->out,O_RDWR);
 						if(sortie < 0){
