@@ -47,14 +47,16 @@ int main() {
 
 		for (it = 0; l->seq[it] != NULL; it++) {
 		}
+		printf("it : %d\n", it);
 
 		int pipes[it - 1][2];
 		spid = fork();
 
+		printf("spid : %d\n", spid);
 		switch(spid){
-
 		case 0:
 			for (it2=0; it2<it; it2++){
+				printf("it 2 : %d\n", it2);
         if (l->seq[it2 + 1] != NULL){
 					pipe(pipes[it2]);
 					spid2 = fork();
@@ -62,13 +64,13 @@ int main() {
 				else{
 					spid2 = 0;
         }
-
+				printf("spid2 : %d\n", spid2);
 				switch (spid2){
 				case -1:
 					perror("fork");
 					exit(-1);
 				case 0:
-
+					printf("case 0\n");
            // redirection de la sortie
 					if (l->out && it2 == it - 1){
 						FILE *fileOut = fopen(l->out, "w");
@@ -87,12 +89,12 @@ int main() {
 						dup2(pipes[it2][1], STDOUT_FILENO);
 						close(pipes[it2][1]);
 					}
-
+					printf("on arrive à execvp\n");
 					execvp(*l->seq[it2], l->seq[it2]);
 					exit(0);
-					break;
 
 				default:
+					printf("default it2\n");
 					if (l->seq[it2 + 1] != NULL){
 						close(pipes[it2][1]);
 						dup2(pipes[it2][0], STDIN_FILENO);
@@ -101,6 +103,7 @@ int main() {
 					break;
 				}
 			}
+			printf("waitpid it2\n");
 			waitpid(spid2, NULL, 0);
 			break;
 
@@ -110,6 +113,7 @@ int main() {
 			break;
 
 		default:
+		printf("default / waitpid it\n");
 			waitpid(spid, NULL, 0);
 			break;
 		}
